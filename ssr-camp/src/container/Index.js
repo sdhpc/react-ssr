@@ -5,7 +5,10 @@ import { getIndexList } from '../store/index'
 function Index(props) {
   const [count, setCount] = useState(1)
   useEffect(() => {
-    props.getIndexList()
+    if(!props.list.length){
+      //客户端来获取
+      props.getIndexList()
+    }
   }, [])
   return <div>
     <h1>首页</h1>
@@ -20,7 +23,9 @@ function Index(props) {
     </ul>
   </div>
 }
-
+Index.loadData = (store)=>{
+  return store.dispatch(getIndexList())
+}
 export default connect(
   state => ({list: state.index.list}),
   {getIndexList}
