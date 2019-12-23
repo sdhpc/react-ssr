@@ -8,6 +8,8 @@ import routes  from '../src/App'
 import {getServerStore} from '../src/store/store'
 import Header from '../src/component/Header'
 import proxy from 'http-proxy-middleware'
+import fs from 'fs'
+import path from 'path'
 
 const store = getServerStore() 
 const app = express()
@@ -21,7 +23,24 @@ app.use(
     changeOrigin:true
   })
 )
+
+function csrRender(res){
+  //读取csr文件 返回
+  const filename  = path.resolve(process.cwd(),'public/index.csr.html')
+  const html = fs.readFileSync(filename,'utf-8')
+  return res.send(html)
+}
+
 app.get('*', (req, res) => {
+  if(req.query._mode=='csr'){
+    console.log('url参数开启csr降级')
+    csrRender(res)
+  }
+  //配置开关开启csr
+  //服务器负载过高开启csr
+
+
+
   //获取根据路由渲染出的组件，并拿到loadDAata方法 获取数据
 
   // if(req.url.startsWith('/api/')){
@@ -57,7 +76,9 @@ app.get('*', (req, res) => {
 
   //等待所有请求结束再渲染
   Promise.all(promise).then(()=>{
-    const context = {}
+    const context = {
+      css:[]
+    }
     //把react组件解析成html
     const content = renderToString(
       <Provider store={store}>
@@ -78,12 +99,16 @@ app.get('*', (req, res) => {
       //状态的切换和页面跳转
       res.redirect(301,context.url)
     }
+    const css = context.css.join('\n')
     //字符串模板
     res.send(`
       <html>
         <head>
           <meta charset="utf-8"/>
           <title>服务端渲染</title>
+          <style>
+            ${css}
+          </style>
         </head>
         <body>
           <div id="root" style="background:aliceblue;">${content}</div>
