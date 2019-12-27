@@ -32,3 +32,14 @@ export default connect(
   state => ({list: state.index.list}),
   {getIndexList}
 )(withStyle(Index,styles))
+
+// const newIndex = connect(
+//   state => ({list: state.index.list}),
+//   {getIndexList}
+// )(withStyle(Index,styles))
+
+// newIndex.loadData = (store)=>{
+//   return store.dispatch(getIndexList())
+// }
+
+// export default newIndex

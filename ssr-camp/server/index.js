@@ -10,6 +10,8 @@ import Header from '../src/component/Header'
 import proxy from 'http-proxy-middleware'
 import fs from 'fs'
 import path from 'path'
+import config from './config'
+
 
 const store = getServerStore() 
 const app = express()
@@ -32,7 +34,7 @@ function csrRender(res){
 }
 
 app.get('*', (req, res) => {
-  if(req.query._mode=='csr'){
+  if(req.query._mode=='csr'||config.csr){
     console.log('url参数开启csr降级')
     csrRender(res)
   }
